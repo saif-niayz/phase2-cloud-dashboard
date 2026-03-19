@@ -8,18 +8,18 @@ let pieChart;
 
 // --- CONFIGURATION ---
 // Replace this with your actual Azure Function URL once deployed
-const API_URL = "https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/analyze_diet";
+const API_URL = "https://diet-analysis-fn7174.azurewebsites.net/api/analyze_diet";
 
 async function fetchData() {
     try {
         executionTimeText.textContent = "Loading data from Azure...";
         
-        // In a real scenario, you'd use fetch(API_URL)
-        // For development/demo without a live URL, we'll use a mock that matches your function_app.py output
-        const response = await getMockData(); 
+        // For Phase 2 it is switched to the API call
+        const response = await fetch(API_URL); 
+        const result = await response.json();
         
-        const data = response.analysis.averages_by_diet;
-        const execTime = response.metadata.execution_time_sec;
+        const data = result.analysis.averages_by_diet;
+        const execTime = result.metadata.execution_time_sec;
 
         loadDashboard(data, execTime);
     } catch (error) {
@@ -118,25 +118,6 @@ dietFilter.addEventListener("change", () => {
 refreshBtn.addEventListener("click", () => {
     fetchData();
 });
-
-// --- MOCK DATA FOR DEMO (Matching Phase 1 Output) ---
-async function getMockData() {
-    return {
-        "metadata": {
-            "execution_time_sec": 0.842,
-            "status": "success"
-        },
-        "analysis": {
-            "averages_by_diet": {
-                "dash": { "Protein(g)": 69.2, "Carbs(g)": 160.5, "Fat(g)": 101.1 },
-                "keto": { "Protein(g)": 101.2, "Carbs(g)": 57.9, "Fat(g)": 153.1 },
-                "mediterranean": { "Protein(g)": 101.1, "Carbs(g)": 152.9, "Fat(g)": 101.4 },
-                "paleo": { "Protein(g)": 88.6, "Carbs(g)": 129.5, "Fat(g)": 135.6 },
-                "vegan": { "Protein(g)": 56.1, "Carbs(g)": 254.0, "Fat(g)": 103.2 }
-            }
-        }
-    };
-}
 
 // Initial Load
 fetchData();
